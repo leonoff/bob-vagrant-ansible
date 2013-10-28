@@ -1,0 +1,5 @@
+- name: MySQL | Install server
+  apt: pkg=$item state=installed force=yes
+  with_items: 
+    - mysql-server
+    - mysql-client

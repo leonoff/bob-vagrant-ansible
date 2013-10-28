@@ -1,0 +1,29 @@
+- name: PHP | Add PHP 5.4 apt repository
+  apt_repository: repo=ppa:ondrej/php5-oldstable
+
+- name: PHP | Install the distribution's PHP base packages
+  apt: pkg=$item state=installed force=yes
+  with_items:
+    - php5-fpm
+    - php5-cli
+    - php5-mysql
+    - php5-sqlite
+    - php5-curl
+    - php5-gd
+    - php-apc
+    - php-pear
+    - php5-xdebug
+
+- name: PHP | PHPDev | Update pear packages
+  command: pear upgrade
+
+- name: php-restart
+  service: name=php5-fpm state=started
+
+- name: PHP | PECL | Test for previous "$package" install
+  command:  pecl list
+  register: peclModules
+  ignore_errors: yes
+
+- include: amqp.yml
+  when: peclModules.stdout.find('amqp') == -1

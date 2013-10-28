@@ -1,0 +1,11 @@
+;## DATABASE ##
+resources.multidb.main.host = "{{ bob_db_host }}"
+resources.multidb.main.username = "{{ bob_db_username }}"
+resources.multidb.main.password = "{{ bob_db_password }}"
+resources.multidb.main.dbname = "{{ bob_db_name }}"
+resources.multidb.main.profiler.enabled = "true"
+resources.multidb.main.profiler.class = "Zend_Db_Profiler_Firebug"
+
+;## LOG ##
+log.email = ""
+sentry.active = 0

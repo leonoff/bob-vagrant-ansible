@@ -1,0 +1,18 @@
+- name: Nginx | Add Nginx apt repository
+  apt_repository: repo=ppa:nginx/stable
+
+- name: Nginx | Install Nginx ('full' version)
+  apt:
+    pkg=nginx
+    update_cache=yes
+    force=yes
+
+- name: Nginx | Push config files
+  template:
+    src=../templates/${item}.j2
+    dest=/etc/nginx/$item
+    owner=root group=root mode=0644
+  with_items:
+    - nginx.conf
+  notify:
+    - nginx-restart

@@ -1,0 +1,13 @@
+bob_domain: app.my_awesome_domain.com
+bob_base_dir: /data
+bob_doc_root: /data/www
+bob_server_log_dir: /data/logs
+bob_app_env: dev
+bob_git_repo: SSH_GIT_REPO
+bob_version: BRANCH_VERSION
+bob_git_key: /abs/path/private/key/
+
+bob_db_host: 
+bob_db_name: 
+bob_db_username: 
+bob_db_password:

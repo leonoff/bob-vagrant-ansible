@@ -1,0 +1,39 @@
+server {
+        listen   80;
+        server_name {{ bob_domain }};
+
+        access_log {{ bob_server_log_dir }}/{{ bob_domain }}.access.log;
+        error_log {{ bob_server_log_dir }}/{{ bob_domain }}/app-mleonov.error.log;
+
+        set $APPLICATION_ENV {{ bob_app_env }};
+
+        add_header Host $server_name;
+        add_header X-Server $hostname;
+
+        gzip on;
+        gzip_min_length 1000;
+        gzip_types text/plain text/xml application/xml;
+
+        client_max_body_size 50m;
+        client_body_timeout 60;
+
+        root {{ bob_doc_root }}/public/;
+        try_files $uri $uri/ /index.php?$args;
+        index index.html index.php;
+
+        set $hashttps "";
+        if ($http_x_forwarded_protocol = https) {
+                set $hashttps on;
+        }
+
+        location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index  index.php;
+                include        fastcgi_params;
+                fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                fastcgi_param PHP_ADMIN_VALUE error_log={{ bob_server_log_dir }}/php-fpm.error.log;
+                fastcgi_param  APPLICATION_ENV $APPLICATION_ENV;
+                fastcgi_param  HTTPS $hashttps;
+                deny all;
+        }
+}

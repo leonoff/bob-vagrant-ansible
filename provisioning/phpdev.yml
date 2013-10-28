@@ -1,0 +1,40 @@
+- hosts: vagrant
+  sudo: true
+  vars_files:
+    - ../provision_vars
+  handlers:
+    - include: nginx/handlers/handlers.yml
+  tasks:
+    - name: Bootstrap | Update apt caches.
+      command: apt-get update
+    - name: Bootstrap | Install 'python-apt' module
+      command: apt-get install python-apt -y
+
+    - name: Bootstrap | Install misc utils
+      apt: pkg=$item state=present
+      with_items:
+        - htop
+        - git
+        - curl
+        - tmux
+        - unzip
+        - python-software-properties
+        - software-properties-common
+        - vim
+
+    - name: Bootstrap | ensure known hosts
+      sudo: false
+      copy: content="" dest=~/.ssh/known_hosts
+
+    - name: Bootstrap | remove github.com from known host
+      sudo: false
+      shell: ssh-keygen -R github.com
+
+    - name: Bootstrap | ensure github.com in known host
+      sudo: false
+      shell: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
+    - include: mysql/mysql.yml
+    - include: nginx/nginx.yml
+    - include: php/php.yml
+    - include: bob/bob.yml

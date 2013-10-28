@@ -1,0 +1,27 @@
+- name: Install pear-packegies and deps
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - make
+    - pkg-config # need for librabbitMQ, which need for amqp pecl php extension
+
+- name: PHP | Rabbitmq-c | Clone rabbitmq-c
+  sudo: false
+  git: repo=git://github.com/alanxz/rabbitmq-c.git dest=/tmp/rabbitmq-c
+
+- name: PHP | Rabbitmq-c | autoreconf
+  command: autoreconf -i chdir=/tmp/rabbitmq-c
+
+- name: PHP | Rabbitmq-c | configure
+  command: ./configure chdir=/tmp/rabbitmq-c
+
+- name: PHP | Rabbitmq-c | make
+  command: make chdir=/tmp/rabbitmq-c
+
+- name: PHP | Rabbitmq-c | make install
+  command: make install chdir=/tmp/rabbitmq-c
+
+- name: PHP | PECL | Install amqp
+  command: pecl install amqp
+
+- name: PHP | PECL | Copy amqp config
+  template: src=php/templates/amqp.ini.j2 dest=/etc/php5/conf.d/amqp.ini owner=root group=root mode=0644

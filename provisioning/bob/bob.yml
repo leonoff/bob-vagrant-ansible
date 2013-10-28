@@ -1,0 +1,39 @@
+- name: BOB | Init base dir
+  file: path=${item} owner=vagrant group=vagrant mode=0755 state=directory
+  with_items:
+    - $bob_base_dir
+    - $bob_doc_root
+    - $bob_server_log_dir
+    - $bob_server_log_dir/$bob_domain
+
+- name: BOB | Put host to Nginx
+  template:
+    src=bob/templates/${item}.j2
+    dest=/etc/nginx/sites-enabled/$item
+    owner=root group=root mode=0644
+  with_items:
+    - bob.conf
+  notify:
+    - nginx-restart
+
+- name: BOB | copy git key
+  sudo: false
+  copy: src=$bob_git_key dest=~/.ssh/id_rsa
+
+- name: BOB | getting fresh code
+  sudo: false
+  git: repo=$bob_git_repo dest=$bob_doc_root/ version=$bob_version
+
+- name: BOB | Init base dir
+  sudo: false
+  file: path=${item} owner=vagrant group=vagrant mode=0777 state=directory
+  with_items:
+    - $bob_doc_root/data/cache
+    - $bob_doc_root/data/logs
+
+- name: BOB | Put BOB dev config
+  sudo: false
+  template:
+    src=bob/templates/dev.ini.j2
+    dest=$bob_doc_root/application/configs/dev.ini
+    owner=vagrant group=vagrant mode=0644
